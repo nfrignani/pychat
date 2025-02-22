@@ -1,0 +1,42 @@
+version: '3'
+services:
+  db:
+    image: mariadb:latest
+    environment:
+      MARIADB_USER: user
+      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: mydatabase
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_AUTO_UPGRADE: "1"
+      MARIADB_DISABLE_UPGRADE_BACKUP: "1"
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb -uroot -prootpassword -e 'SELECT 1'"]
+      interval: 10s
+      timeout: 30s
+      retries: 10
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  app:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: mysql+pymysql://user:password@db/mydatabase
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["./wait-for-db.sh", "db:3306", "--", "python", "app.py"]
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      app:
+        condition: service_started
+
+volumes:
+  mariadb_data:
