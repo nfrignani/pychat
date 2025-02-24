@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+//import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from './axios';
 
 const Login = ({ onLogin }) => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -22,8 +21,8 @@ const handleSubmit = async (e) => {
     alert(`Token: ${res.data.access_token}`); // TODO remove
     // onLogin();
     // window.location.href = '/chat'; // aggiungi questa riga per reindirizzare l'utente alla pagina principale dopo il login
-    navigate('/chat'); // utilizza navigate per navigare alla pagina /chat
-    //return <Navigate to="/chat" replace />;
+    //navigate('/chat'); // utilizza navigate per navigare alla pagina /chat
+    return <Navigate to="/chat" replace />;
   } catch (err) {
     console.error('Errore API:', err);
   }
